@@ -1,0 +1,95 @@
+---
+title: "Lab 3"
+Author: "Liying Deng"
+format: html
+editor: visual
+---
+
+#Question 1
+```{r}
+download.file(
+  "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
+  destfile = file.path("~", "Downloads", "met_all.gz"),
+  method   = "libcurl",
+  timeout  = 60
+)
+met <- data.table::fread(file.path("~", "Downloads", "met_all.gz"))
+met <- as.data.frame(met)
+```
+
+#Question 2
+```{r}
+dim(met)
+```
+
+```{r}
+head(met)
+```
+
+```{r}
+tail(met)
+```
+
+#Question 3
+```{r}
+str(met)
+```
+
+#Question 4
+```{r}
+table(met$year)
+table(met$day)
+table(met$hour)
+summary(met$temp)
+summary(met$elev)
+summary(met$wind.sp)
+met[met$elev==9999.0, ] <- NA
+summary(met$elev)
+met <- met[met$temp > -40, ]
+head(met[order(met$temp), ])
+sum(is.na(met$wind.sp))
+```
+
+#Question 5
+
+Search the data from Google base on the location (Colorado Springs), I got the information about the lowest temperature by yearly is -10C. Therefore, the lowest temperature -17.2C doesn't make sense.
+
+```{r}
+met <- met[met$temp > -16, ]
+head(met[order(met$temp), ])
+```
+
+#Question 6
+
+```{r}
+elev <- met[which(met$elev == max(met$elev, na.rm = TRUE)), ]
+summary(elev)
+cor(elev$temp, elev$wind.sp, use="complete")
+cor(elev$temp, elev$hour, use="complete")
+cor(elev$wind.sp, elev$day, use="complete")
+cor(elev$wind.sp, elev$hour, use="complete")
+cor(elev$temp, elev$day, use="complete")
+```
+
+# Question 7
+
+```{r}
+hist(met$elev, main= "Histogram of Elevation")
+hist(met$temp,main= "Histogram of temperature")
+hist(met$wind.sp,main= "Histogram of wind speed")
+library(leaflet)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+library(lubridate)
+elev$date <- with(elev, ymd_h(paste(year, month, day, hour, sep= ' ')))
+summary(elev$date)
+elev <- elev[order(elev$date), ]
+head(elev)
+plot(elev$date,elev$temp, type = "l")
+plot(elev$date,elev$wind.sp, type = "l")
+```
+
+# Question 8
+
+Question: Why we need to use correlation coefficient statistical method on Question 6?
