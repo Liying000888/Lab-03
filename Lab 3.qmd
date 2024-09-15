@@ -3,6 +3,7 @@ title: "Lab 3"
 Author: "Liying Deng"
 format: html
 editor: visual
+embed-resources: true
 ---
 
 #Question 1
